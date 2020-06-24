@@ -1,8 +1,16 @@
 name: Setup .NET Core SDK
-on: [push]
+on: 
+  push:
+    branches: 
+      - master
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
 jobs:
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       # Authenticates packages to push to GPR
@@ -12,8 +20,9 @@ jobs:
           source-url: https://nuget.pkg.github.com/pilad0hwtts/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: dotnet build
-      - name: Create the package
-        run: dotnet pack --configuration Release
+      - name: Generate NuGet package
+        run: 
+          cd <project>
+          dotnet pack -c Release -o out  
       - name: Publish the package to GPR
-        run: dotnet nuget push bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} --no-symbols true
+        run: dotnet nuget push ./<project>/out/*.nupkg --skip-duplicate --no-symbols true
