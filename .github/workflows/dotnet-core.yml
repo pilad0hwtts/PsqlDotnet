@@ -12,7 +12,7 @@ jobs:
           source-url: https://nuget.pkg.github.com/pilad0hwtts/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: dotnet build PsqlDotnet
+      - run: dotnet build
       - name: Create the package
         run: dotnet pack --configuration Release PsqlDotnet
       - name: Publish the package to GPR
