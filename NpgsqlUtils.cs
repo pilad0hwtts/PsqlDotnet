@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace PsqlDotnet {
-    //Большая часть команд требует привилегий суперпользователя
+    
     //TODO: LOG conventionals?
     static class NpgsqlUtils {
 
