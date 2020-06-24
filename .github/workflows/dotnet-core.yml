@@ -1,14 +1,19 @@
-steps:
-- uses: actions/checkout@master
-# Authenticates packages to push to GPR
-- uses: actions/setup-dotnet@v1
-  with:
-    dotnet-version: '3.1.x' # SDK Version to use.
-    source-url: https://nuget.pkg.github.com/pilad0hwtts/index.json
-  env:
-    NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-- run: dotnet build PsqlDotnet
-- name: Create the package
-  run: dotnet pack --configuration Release PsqlDotnet
-- name: Publish the package to GPR
-  run: dotnet nuget push PsqlDotnet/bin/Release/*.nupkg
+name: Setup .NET Core SDK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@master
+      # Authenticates packages to push to GPR
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x' # SDK Version to use.
+          source-url: https://nuget.pkg.github.com/pilad0hwtts/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
+      - run: dotnet build PsqlDotnet
+      - name: Create the package
+        run: dotnet pack --configuration Release PsqlDotnet
+      - name: Publish the package to GPR
+        run: dotnet nuget push PsqlDotnet/bin/Release/*.nupkg
