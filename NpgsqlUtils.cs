@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace TestPostgres {
+namespace PsqlDotnet {
     //Большая часть команд требует привилегий суперпользователя
     //TODO: LOG conventionals?
     static class NpgsqlUtils {

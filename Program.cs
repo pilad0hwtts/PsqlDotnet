@@ -8,7 +8,7 @@ using Serilog;
 
 
 //TODO: Normal namespace naming?
-namespace TestPostgres {
+namespace PsqlDotnet {
     //TODO: Адаптировать к загрузчику (записать все что неудобно сейчас и сделать TODOшки)
     //TODO: Подумать/посмотрть над возможной интеграции работы с геоданными и с растрами
 

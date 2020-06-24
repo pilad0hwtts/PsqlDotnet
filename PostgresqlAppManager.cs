@@ -13,7 +13,7 @@ using Serilog;
 using System.Diagnostics;
 
 
-namespace TestPostgres
+namespace PsqlDotnet
 {
 
     //TODO: Нужен Utils или что то такое
