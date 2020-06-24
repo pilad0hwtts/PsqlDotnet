@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
+//TODO: For fun
 namespace PsqlDotnet {
     
     //TODO: LOG conventionals?
