@@ -21,8 +21,7 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
       - name: Generate NuGet package
-        run: |
-          cd <project>
-          dotnet pack -c Release -o out  
+        run:           
+          dotnet pack <project> -c Release -o out  
       - name: Publish the package to GPR
         run: dotnet nuget push ./<project>/out/*.nupkg --skip-duplicate --no-symbols true
