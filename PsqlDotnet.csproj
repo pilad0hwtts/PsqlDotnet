@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
+    <PackageId>PsqlDotnet</PackageId>
     <Version>0.0.2</Version>
     <OutputType>Exe</OutputType>
+    <Authors>pilad0hwtts</Authors>
+    <Company>TI</Company>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RepositoryUrl>https://github.com/pilad0hwtts/PsqlDotnet</RepositoryUrl>
   </PropertyGroup>
