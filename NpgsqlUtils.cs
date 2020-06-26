@@ -10,7 +10,7 @@ using Serilog;
 namespace PsqlDotnet {
     
     //TODO: LOG conventionals?
-    static class NpgsqlUtils {
+    public static class NpgsqlUtils {
 
         public static NpgsqlConnection Execute (this NpgsqlConnection connection, string sqlCommand) {
             Log.Information ("Execute {command}", sqlCommand);
