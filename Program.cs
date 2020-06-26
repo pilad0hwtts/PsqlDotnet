@@ -57,9 +57,17 @@ namespace PsqlDotnet
             Console.WriteLine("Enter password: ");
             password = GetPassword();
 
-            using var conf = new PostgresqlAppManager(workDirectory, new PostgresqlAppManager.User(username, password));
+            using var conf = new PostgresqlAppManager(workDirectory, new PostgresqlAppManager.User(username, password));           
+            using var ps = new PostgisManager(conf);
 
             bool isForceInstall = args.Any(x => x == "force");
+
+            if (isForceInstall || conf.IsInstalled) {
+                if (conf.IsRunning)
+                    conf.StopPostgres();
+                conf.InstallPostgreSql();
+                ps.InstallPostgis();
+            }
 
             var sudoUser = new Npgsql.NpgsqlConnectionStringBuilder
             {
@@ -69,10 +77,6 @@ namespace PsqlDotnet
                 Password = "postgres"
             };
 
-            
-
-
-/*
             if (!conf.IsRunning)
             {
                 conf.RunPostgres();
@@ -88,7 +92,7 @@ namespace PsqlDotnet
                     isDbReady &= contex.Database.CanConnect ();
                 } catch {
                     isDbReady = false;
-                }
+                }*/
 
                 if (!isDbReady)
                 {
@@ -108,12 +112,15 @@ namespace PsqlDotnet
                                 Name = "TestDatabase",
                                 Owner = "pilad",
 
-                            });
+                            });                        
+                        contex.Database.EnsureCreated();    
+                        connection.ChangeDatabase("testdatabase");
+                        connection.Execute(ps.ActivatePostgisSql());
                         //TODO: Is nesessary?
                         connection.Close();
                     }
-                    Log.Information("Recreating full scheme contex...");
-                    contex.Database.EnsureCreated();
+                    Log.Information("Recreating full scheme contex...");                    
+                    
                 }
 
                 contex.Works.Add(new Work { first = "123", second = "dsa" });
@@ -130,7 +137,7 @@ namespace PsqlDotnet
 
             System.Threading.Thread.Sleep (1000);
             
-            }*/
+            
         }
         public static SecureString GetPassword()
         {
