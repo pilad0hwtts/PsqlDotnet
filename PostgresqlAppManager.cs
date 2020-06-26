@@ -59,6 +59,29 @@ namespace PsqlDotnet
     //TODO: Название не подходит
     public class PostgresqlAppManager : IDisposable
     {
+        public class User : IDisposable {
+            string name;
+            System.Security.SecureString password;
+            public void Dispose() => password.Dispose();
+            
+            public User(string name, System.Security.SecureString password) {
+                this.name = name;
+                this.password = password;
+            }            
+            public void ApplyUserData(ProcessStartInfo info) {
+                info.UserName = name;
+                info.Password = password;
+            }            
+        }        
+        protected User user = null;
+        protected void AplyUserData(ProcessStartInfo info) {
+            if (user != null) 
+                user.ApplyUserData(info);
+        }
+            
+        
+
+
         public bool IsInstalled
         {
             get => Directory.Exists(RootFolder) 
@@ -76,31 +99,35 @@ namespace PsqlDotnet
         public string RootFolder { get; protected set; }
         //TODO: Downlaoder Entity or something
         protected WebClient DownloadClient { get; set; } = new WebClient();
-        public PostgresqlAppManager(string rootFolder)
-        {
-            this.RootFolder = rootFolder;
-        }        
+        public PostgresqlAppManager(string rootFolder) => RootFolder = rootFolder;
+        public PostgresqlAppManager(string rootFolder, User user) : this(rootFolder) => this.user = user;
+
         public void RunPostgres()
         {
             var processInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(RootFolder, "pgsql", "bin", "pg_ctl"),
-                Arguments = $"start -D \"{Path.Combine(RootFolder, "data")}\" -l \"{Path.Combine(RootFolder, "log", "log.txt")}\"",
-                UseShellExecute = false
+                Arguments = $"start -D \"{Path.Combine(RootFolder, "data")}\" -l \"{Path.Combine(RootFolder, "log", "log.txt")}\" -W",        
+                WindowStyle =ProcessWindowStyle.Hidden,        
+                CreateNoWindow = true
             };
+            AplyUserData(processInfo);
             var pg_ctl = new Process();
             pg_ctl.StartInfo = processInfo;
-            pg_ctl.StartProcessWithFullLogging().WaitForSuccessfulEnd();
+            pg_ctl.Start();
+            pg_ctl.WaitForExit();
         }
+
 
         public void StopPostgres()
         {
             var processInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(RootFolder, "pgsql", "bin", "pg_ctl"),
-                Arguments = $"stop -D \"{Path.Combine(RootFolder, "data")}\"",
+                Arguments = $"stop -D \"{Path.Combine(RootFolder, "data")}\" -W",
                 UseShellExecute = false
             };
+            AplyUserData(processInfo);
             var pg_ctl = new Process();
             pg_ctl.StartInfo = processInfo;
             pg_ctl.StartProcessWithFullLogging().WaitForSuccessfulEnd();
@@ -111,9 +138,10 @@ namespace PsqlDotnet
             var processInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(RootFolder, "pgsql", "bin", "pg_ctl"),
-                Arguments = $"restart -D \"{Path.Combine(RootFolder, "data")}\" -l \"{Path.Combine(RootFolder, "log", "log.txt")}\"",
+                Arguments = $"restart -D \"{Path.Combine(RootFolder, "data")}\" -l \"{Path.Combine(RootFolder, "log", "log.txt")}\" -W",
                 UseShellExecute = false
             };
+            AplyUserData(processInfo);
             var pg_ctl = new Process();
             pg_ctl.StartInfo = processInfo;
             pg_ctl.StartProcessWithFullLogging().WaitForSuccessfulEnd();
@@ -150,6 +178,7 @@ namespace PsqlDotnet
                 WorkingDirectory = Path.Combine(RootFolder, "pgsql", "bin"),
                 UseShellExecute = false,          
             };
+            AplyUserData(processInfo);
 
             var process = new Process {
                 StartInfo = processInfo
@@ -183,6 +212,7 @@ namespace PsqlDotnet
                     FileName = "/bin/tar",
                     Arguments = $"-xf {archivePath} -C {RootFolder}"
                 };
+                AplyUserData(processInfo);
                 var process = new Process { 
                     StartInfo = processInfo
                 }.StartProcessWithFullLogging().WaitForSuccessfulEnd();
@@ -225,6 +255,8 @@ namespace PsqlDotnet
         public void Dispose()
         {
             DownloadClient.Dispose();
+            if (user != null) 
+                user.Dispose();
         }
 
 
