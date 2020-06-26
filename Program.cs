@@ -41,8 +41,11 @@ namespace PsqlDotnet {
             Log.Information ("Start testing PostgreConfigurer");
             var workDirectory = Path.Combine (Directory.GetParent (Directory.GetCurrentDirectory ()).FullName, "postgres-oracle");
             using var conf = new PostgresqlAppManager (workDirectory);
+            if (!conf.IsRunning)
+                conf.RunPostgres ();
+            //new PostgisManager(conf).InstallPostgis();
 
-            bool isForceInstall = args.Any (x => x == "force");
+            /*bool isForceInstall = args.Any (x => x == "force");
 
             var sudoUser = new Npgsql.NpgsqlConnectionStringBuilder {
                 Host = "127.0.0.1",
@@ -51,12 +54,7 @@ namespace PsqlDotnet {
                 Password = "postgres"
             };
 
-            Log.Information ("PostgreSql installed? ({value})", conf.IsInstalled);
-            if (!conf.IsInstalled || isForceInstall) {
-                if (conf.IsRunning)
-                    conf.StopPostgres ();
-                conf.InstallPostgreSql ();
-            }
+            
 
             if (!conf.IsRunning)
                 conf.RunPostgres ();
@@ -70,7 +68,7 @@ namespace PsqlDotnet {
                     isDbReady &= contex.Database.CanConnect ();
                 } catch {
                     isDbReady = false;
-                }*/
+                }
 
                 if (!isDbReady) {
                     Log.Information ("Need recreation of database");
@@ -102,6 +100,7 @@ namespace PsqlDotnet {
             //conf.StopPostgres();
 
             System.Threading.Thread.Sleep (1000);
+            */
 
         }
     }

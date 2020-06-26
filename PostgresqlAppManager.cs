@@ -74,6 +74,7 @@ namespace PsqlDotnet
         public string DownloadUrlLinux {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12574";
         public string DownloadUrlWindows {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12546";
         public string RootFolder { get; protected set; }
+        //TODO: Downlaoder Entity or something
         protected WebClient DownloadClient { get; set; } = new WebClient();
         public PostgresqlAppManager(string rootFolder)
         {
