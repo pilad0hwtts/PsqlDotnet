@@ -9,11 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
 
 
-//TODO: Normal namespace naming?
 namespace PsqlDotnet
 {
-    //TODO: Адаптировать к загрузчику (записать все что неудобно сейчас и сделать TODOшки)
-    //TODO: Подумать/посмотрть над возможной интеграции работы с геоданными и с растрами
 
     [Table("work", Schema = "total")]
     public class Work
@@ -40,8 +37,7 @@ namespace PsqlDotnet
     class Program
     {
         static void Main(string[] args)
-        {
-            
+        {            
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .CreateLogger();
@@ -119,8 +115,7 @@ namespace PsqlDotnet
                         //TODO: Is nesessary?
                         connection.Close();
                     }
-                    Log.Information("Recreating full scheme contex...");                    
-                    
+                    Log.Information("Recreating full scheme contex...");                                        
                 }
 
                 contex.Works.Add(new Work { first = "123", second = "dsa" });

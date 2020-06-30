@@ -5,18 +5,12 @@ using System.Linq;
 
 using System.Net;
 using System.IO;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Tar;
 using Serilog;
 using System.Diagnostics;
 
 
 namespace PsqlDotnet
-{
-
-    //TODO: Нужен Utils или что то такое
+{    
     static class AdvancedProcess
     {
         //process is ready to run
@@ -78,10 +72,6 @@ namespace PsqlDotnet
             if (user != null) 
                 user.ApplyUserData(info);
         }
-            
-        
-
-
         public bool IsInstalled
         {
             get => Directory.Exists(RootFolder) 
@@ -97,9 +87,20 @@ namespace PsqlDotnet
         public string DownloadUrlLinux {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12574";
         public string DownloadUrlWindows {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12546";
         public string RootFolder { get; protected set; }
-        //TODO: Downlaoder Entity or something
+        public PostgisManager postgisManager {get; protected set; }        
         protected WebClient DownloadClient { get; set; } = new WebClient();
-        public PostgresqlAppManager(string rootFolder) => RootFolder = rootFolder;
+        
+        public void Dispose()
+        {
+            DownloadClient.Dispose();
+            postgisManager.Dispose();
+            if (user != null) 
+                user.Dispose();
+        }
+        public PostgresqlAppManager(string rootFolder) { 
+            RootFolder = rootFolder;
+            postgisManager = new PostgisManager(this);
+        }
         public PostgresqlAppManager(string rootFolder, User user) : this(rootFolder) => this.user = user;
 
         public void RunPostgres()
@@ -116,6 +117,14 @@ namespace PsqlDotnet
             pg_ctl.StartInfo = processInfo;
             pg_ctl.Start();
             pg_ctl.WaitForExit();
+            var c = 0;
+            while (!IsRunning) {
+                System.Threading.Thread.Sleep(500);
+                ++c;
+                if (c > 10) {
+                    throw new Exception("PostgreSQL run timeout");
+                }
+            }
         }
 
 
@@ -174,7 +183,7 @@ namespace PsqlDotnet
             var processInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(RootFolder, "pgsql", "bin", "initdb"),
-                Arguments = $"-U postgres -A password -E utf8 --pwfile \"{passwordFile}\" -D \"{Path.Combine(RootFolder, "data")}",
+                Arguments = $"-U postgres -A password --encoding UTF8 --locale american_usa --lc-collate american_usa --lc-ctype american_usa --lc-messages american_usa --lc-monetary american_usa --lc-numeric american_usa --lc-time american_usa --pwfile \"{passwordFile}\" -D \"{Path.Combine(RootFolder, "data")}",
                 WorkingDirectory = Path.Combine(RootFolder, "pgsql", "bin"),
                 UseShellExecute = false,          
             };
@@ -191,7 +200,7 @@ namespace PsqlDotnet
             {
                 using (var rawStream = DownloadClient.OpenRead(DownloadUrlWindows))
                 {
-                    UnzipFromStream(rawStream, RootFolder);
+                    Utils.UnzipFromStream(rawStream, RootFolder);
                 }
             }
             catch (Exception e)
@@ -224,41 +233,6 @@ namespace PsqlDotnet
                 Log.Fatal(e.Message);
             }
         }
-        public static void UnzipFromStream(Stream zipStream, string outFolder)
-        {
-            using (var zipInputStream = new ZipInputStream(zipStream))
-            {
-                while (zipInputStream.GetNextEntry() is ZipEntry zipEntry)
-                {
-                    var entryFileName = zipEntry.Name;
-
-                    var buffer = new byte[4096];
-
-                    var fullZipToPath = Path.Combine(outFolder, entryFileName);
-                    var directoryName = Path.GetDirectoryName(fullZipToPath);
-                    if (directoryName.Length > 0)
-                        Directory.CreateDirectory(directoryName);
-
-                    if (Path.GetFileName(fullZipToPath).Length == 0)
-                    {
-                        continue;
-                    }
-
-                    using (FileStream streamWriter = File.Create(fullZipToPath))
-                    {
-                        StreamUtils.Copy(zipInputStream, streamWriter, buffer);
-                    }
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            DownloadClient.Dispose();
-            if (user != null) 
-                user.Dispose();
-        }
-
 
     }
 
