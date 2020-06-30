@@ -1,12 +1,10 @@
 using System;
 using Npgsql;
-//TODO: More atteributes
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-//TODO: For fun
 namespace PsqlDotnet {
     
     //TODO: LOG conventionals?

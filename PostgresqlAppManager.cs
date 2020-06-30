@@ -10,9 +10,7 @@ using System.Diagnostics;
 
 
 namespace PsqlDotnet
-{
-
-    //TODO: Нужен Utils или что то такое
+{    
     static class AdvancedProcess
     {
         //process is ready to run
