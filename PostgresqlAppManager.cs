@@ -87,9 +87,20 @@ namespace PsqlDotnet
         public string DownloadUrlLinux {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12574";
         public string DownloadUrlWindows {get; set; } = "https://sbp.enterprisedb.com/getfile.jsp?fileid=12546";
         public string RootFolder { get; protected set; }
-        //TODO: Downlaoder Entity or something
+        public PostgisManager postgisManager {get; protected set; }        
         protected WebClient DownloadClient { get; set; } = new WebClient();
-        public PostgresqlAppManager(string rootFolder) => RootFolder = rootFolder;
+        
+        public void Dispose()
+        {
+            DownloadClient.Dispose();
+            postgisManager.Dispose();
+            if (user != null) 
+                user.Dispose();
+        }
+        public PostgresqlAppManager(string rootFolder) { 
+            RootFolder = rootFolder;
+            postgisManager = new PostgisManager(this);
+        }
         public PostgresqlAppManager(string rootFolder, User user) : this(rootFolder) => this.user = user;
 
         public void RunPostgres()
@@ -214,15 +225,6 @@ namespace PsqlDotnet
                 Log.Fatal(e.Message);
             }
         }
-
-
-        public void Dispose()
-        {
-            DownloadClient.Dispose();
-            if (user != null) 
-                user.Dispose();
-        }
-
 
     }
 
