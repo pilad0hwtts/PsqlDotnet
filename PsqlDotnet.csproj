@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <PackageId>PsqlDotnet</PackageId>
-    <Version>0.0.4</Version>
+    <Version>0.0.5</Version>
     <OutputType>Exe</OutputType>
     <Authors>pilad0hwtts</Authors>
     <Company>TI</Company>
