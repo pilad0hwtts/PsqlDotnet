@@ -40,8 +40,7 @@ namespace PsqlDotnet
     class Program
     {
         static void Main(string[] args)
-        {
-            
+        {            
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .CreateLogger();
@@ -119,8 +118,7 @@ namespace PsqlDotnet
                         //TODO: Is nesessary?
                         connection.Close();
                     }
-                    Log.Information("Recreating full scheme contex...");                    
-                    
+                    Log.Information("Recreating full scheme contex...");                                        
                 }
 
                 contex.Works.Add(new Work { first = "123", second = "dsa" });

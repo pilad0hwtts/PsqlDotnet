@@ -5,10 +5,6 @@ using System.Linq;
 
 using System.Net;
 using System.IO;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Tar;
 using Serilog;
 using System.Diagnostics;
 
@@ -78,10 +74,6 @@ namespace PsqlDotnet
             if (user != null) 
                 user.ApplyUserData(info);
         }
-            
-        
-
-
         public bool IsInstalled
         {
             get => Directory.Exists(RootFolder) 
@@ -191,7 +183,7 @@ namespace PsqlDotnet
             {
                 using (var rawStream = DownloadClient.OpenRead(DownloadUrlWindows))
                 {
-                    UnzipFromStream(rawStream, RootFolder);
+                    Utils.UnzipFromStream(rawStream, RootFolder);
                 }
             }
             catch (Exception e)
@@ -224,33 +216,7 @@ namespace PsqlDotnet
                 Log.Fatal(e.Message);
             }
         }
-        public static void UnzipFromStream(Stream zipStream, string outFolder)
-        {
-            using (var zipInputStream = new ZipInputStream(zipStream))
-            {
-                while (zipInputStream.GetNextEntry() is ZipEntry zipEntry)
-                {
-                    var entryFileName = zipEntry.Name;
 
-                    var buffer = new byte[4096];
-
-                    var fullZipToPath = Path.Combine(outFolder, entryFileName);
-                    var directoryName = Path.GetDirectoryName(fullZipToPath);
-                    if (directoryName.Length > 0)
-                        Directory.CreateDirectory(directoryName);
-
-                    if (Path.GetFileName(fullZipToPath).Length == 0)
-                    {
-                        continue;
-                    }
-
-                    using (FileStream streamWriter = File.Create(fullZipToPath))
-                    {
-                        StreamUtils.Copy(zipInputStream, streamWriter, buffer);
-                    }
-                }
-            }
-        }
 
         public void Dispose()
         {
