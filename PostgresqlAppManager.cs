@@ -117,6 +117,14 @@ namespace PsqlDotnet
             pg_ctl.StartInfo = processInfo;
             pg_ctl.Start();
             pg_ctl.WaitForExit();
+            var c = 0;
+            while (!IsRunning) {
+                System.Threading.Thread.Sleep(500);
+                ++c;
+                if (c > 10) {
+                    throw new Exception("PostgreSQL run timeout");
+                }
+            }
         }
 
 
@@ -175,7 +183,7 @@ namespace PsqlDotnet
             var processInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(RootFolder, "pgsql", "bin", "initdb"),
-                Arguments = $"-U postgres -A password -E utf8 --pwfile \"{passwordFile}\" -D \"{Path.Combine(RootFolder, "data")}",
+                Arguments = $"-U postgres -A password --encoding UTF8 --locale american_usa --lc-collate american_usa --lc-ctype american_usa --lc-messages american_usa --lc-monetary american_usa --lc-numeric american_usa --lc-time american_usa --pwfile \"{passwordFile}\" -D \"{Path.Combine(RootFolder, "data")}",
                 WorkingDirectory = Path.Combine(RootFolder, "pgsql", "bin"),
                 UseShellExecute = false,          
             };
